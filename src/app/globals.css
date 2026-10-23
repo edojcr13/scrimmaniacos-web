@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@theme {
+  --color-fondo: #0b0b16;
+  --color-panel: #141428;
+  --color-borde: #26264a;
+  --color-texto: #e8e8f4;
+  --color-suave: #9a9ac0;
+  --color-acento: #facc15;
+  --color-violeta: #8b5cf6;
+}
+
+/* inline: las variables de next/font existen en <body>, no en :root */
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-rajdhani), var(--font-inter), sans-serif;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+@utility card {
+  @apply rounded-xl border border-borde bg-panel;
+}
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility btn-primario {
+  @apply btn bg-acento text-black hover:bg-yellow-300;
+}
+@utility btn-secundario {
+  @apply btn border border-borde bg-white/5 text-texto hover:bg-white/10;
+}
+@utility btn-peligro {
+  @apply btn border border-red-500/40 bg-red-500/10 text-red-300 hover:bg-red-500/20;
+}
+@utility input {
+  @apply w-full rounded-lg border border-borde bg-fondo px-3 py-2 text-sm text-texto placeholder:text-suave/60 focus:border-violeta focus:outline-none;
+}
+@utility label {
+  @apply mb-1 block text-xs font-semibold tracking-wide text-suave uppercase;
+}
+@utility titulo {
+  @apply font-display text-2xl font-bold tracking-tight sm:text-3xl;
+}

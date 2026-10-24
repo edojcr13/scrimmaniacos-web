@@ -48,6 +48,14 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
+-- Perfiles para los usuarios que ya existían antes de crear el trigger.
+insert into public.profiles (id, display_name, avatar_url)
+select id,
+       coalesce(raw_user_meta_data ->> 'full_name', raw_user_meta_data ->> 'name', 'Entrenador'),
+       raw_user_meta_data ->> 'avatar_url'
+from auth.users
+on conflict (id) do nothing;
+
 create or replace function public.is_admin()
 returns boolean language sql stable security definer set search_path = public as $$
   select coalesce((select is_admin from public.profiles where id = auth.uid()), false);

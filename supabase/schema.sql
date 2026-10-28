@@ -289,7 +289,8 @@ begin
 
   select * into v_t from public.tournaments where id = p_tournament for update;
   if not found then raise exception 'Torneo no encontrado'; end if;
-  if v_t.status not in ('borrador', 'inscripciones') then
+  if v_t.status not in ('borrador', 'inscripciones')
+     or exists (select 1 from public.matches where tournament_id = p_tournament) then
     raise exception 'El bracket ya fue generado';
   end if;
 
@@ -301,8 +302,6 @@ begin
   while v_size < v_n loop v_size := v_size * 2; v_rounds := v_rounds + 1; end loop;
   v_byes := v_size - v_n;
   v_half := v_size / 2;
-
-  delete from public.matches where tournament_id = p_tournament;
 
   -- Crear partidas desde la final hacia atrás para poder enlazar next_match_id.
   for v_r in reverse v_rounds..1 loop
@@ -595,6 +594,12 @@ revoke update on public.scrims from anon, authenticated;
 revoke execute on function public._advance(uuid) from public, anon, authenticated;
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
 revoke execute on function public.handle_new_team() from public, anon, authenticated;
+-- Ayudantes de las políticas: solo los necesitan usuarios con sesión
+-- (is_admin también lo usa la lectura pública de torneos).
+revoke execute on function public.acts_for(uuid) from public, anon;
+revoke execute on function public.is_captain(uuid) from public, anon;
+grant execute on function public.acts_for(uuid) to authenticated;
+grant execute on function public.is_captain(uuid) to authenticated;
 do $$
 declare f text;
 begin
